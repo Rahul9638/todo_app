@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:todo_app/modules/data/employee_detail.dart';
+import 'package:todo_app/modules/employee_manager/bloc/employee_bloc.dart';
 import 'package:todo_app/modules/employee_manager/view/widget/employee_role_bottomsheet.dart';
 import 'package:todo_app/modules/widgets/button/filled_button.dart';
 import 'package:todo_app/modules/widgets/custom_input_field.dart';
@@ -13,44 +17,45 @@ class AddEmployeePage extends StatefulWidget {
 
 class _AddEmployeePageState extends State<AddEmployeePage> {
   final TextEditingController employeeName = TextEditingController();
-  final TextEditingController selectRole = TextEditingController();
+  final TextEditingController employeeRole = TextEditingController();
   final TextEditingController startDate = TextEditingController();
   final TextEditingController lastDate = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        centerTitle: false,
-        title: Text(
-          'Add Employee',
-          style: theme.textTheme.titleMedium
-              ?.copyWith(color: theme.colorScheme.onPrimary),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 20),
-            employeeNameField(),
-            const SizedBox(height: 20),
-            employeRoleField(),
-            const SizedBox(height: 20),
-            dateField(),
-          ],
+      appBar: getAppBar(theme),
+      body: BlocListener<EmployeeBloc, EmployeeState>(
+        listener: (BuildContext context, EmployeeState state) {
+          addEmployeeListener(context, state);
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const SizedBox(height: 20),
+              employeeNameField(),
+              const SizedBox(height: 20),
+              employeRoleField(),
+              const SizedBox(height: 20),
+              dateField(),
+            ],
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: fABButton(),
     );
+  }
+
+  void addEmployeeListener(BuildContext context, EmployeeState state) {
+    if (state is AddEmployeeLoading) {
+      // circularProgress Indicator.
+    }
+    if (state is AddEmployeeSuccess) {
+      Navigator.of(context).pop();
+    }
   }
 
   Widget fABButton() {
@@ -64,7 +69,7 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
                   color: theme.colorScheme.outlineVariant, width: 2))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           const Spacer(),
           Expanded(
             child: CustomFilledButton(
@@ -84,7 +89,11 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
             child: CustomFilledButton(
               backgroundColor: theme.colorScheme.secondary,
               borderRadius: 6,
-              onPressed: () {},
+              onPressed: () {
+                BlocProvider.of<EmployeeBloc>(context).add(
+                  AddEmployeeRequested(data: getData()),
+                );
+              },
               child: const Text('Save'),
             ),
           ),
@@ -93,9 +102,29 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
     );
   }
 
+  EmployeeData getData() => EmployeeData(
+        employeeName: employeeName.text,
+        employeeRole: employeeRole.text,
+        startDate: startDate.text,
+        endDate: lastDate.text.isEmpty ? null : lastDate.text,
+      );
+  AppBar getAppBar(ThemeData theme) => AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: false,
+        title: Text(
+          'Add Employee',
+          style: theme.textTheme.titleMedium
+              ?.copyWith(color: theme.colorScheme.onPrimary),
+        ),
+      );
   Widget dateField() => Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           startDateField(),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -107,7 +136,9 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
 
   Widget lastDateField() => Expanded(
         child: InputTextField(
-          onTap: () {},
+          onTap: () {
+            datePicker(lastDate);
+          },
           readOnly: true,
           controller: lastDate,
           textCapitalization: TextCapitalization.words,
@@ -120,10 +151,25 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
               hintText: 'Select Role'),
         ),
       );
+  void datePicker(TextEditingController date) {
+    showDatePicker(
+            context: context,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2030))
+        .then((DateTime? value) {
+      if (value != null) {
+        final DateFormat formatter = DateFormat('dd MMM yyyy');
+        final String formatted = formatter.format(value);
+        date.text = formatted;
+        setState(() {});
+      }
+    });
+  }
 
   Widget startDateField() => Expanded(
         child: InputTextField(
           onTap: () {
+            datePicker(startDate);
           },
           readOnly: true,
           controller: startDate,
@@ -140,12 +186,12 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
   Widget employeRoleField() => InputTextField(
         onTap: () {
           showEmployRoleBottomSheet(context, role: (String role) {
-            selectRole.text = role;
+            employeeRole.text = role;
             Navigator.of(context).pop();
           });
         },
         readOnly: true,
-        controller: selectRole,
+        controller: employeeRole,
         textCapitalization: TextCapitalization.words,
         keyboardType: TextInputType.name,
         decoration: CustomInputDecoration.outlineInputDecoration(
