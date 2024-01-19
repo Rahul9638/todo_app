@@ -39,8 +39,7 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
           if (state is EmployeeLoaded && state.employeeData.isNotEmpty) {
             return Column(
               children: [
-                Expanded(
-                    child: EmployeeList(state: state)),
+                Expanded(child: EmployeeList(data: state.employeeData)),
                 categoryLabel(theme, 'Swip left to delete'),
               ],
             );
@@ -67,7 +66,7 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
     return Container(
       height: 95,
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       color: theme.colorScheme.outlineVariant,
       child: Text(
         label,

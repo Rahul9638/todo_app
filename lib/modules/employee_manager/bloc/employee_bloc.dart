@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/modules/data/employee_detail.dart';
 import 'package:todo_app/modules/repository/employee_repository.dart';

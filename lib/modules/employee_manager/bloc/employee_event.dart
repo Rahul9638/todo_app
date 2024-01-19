@@ -1,16 +1,21 @@
 part of 'employee_bloc.dart';
 
-class EmployeeEvent {}
+class EmployeeEvent extends Equatable {
+  const EmployeeEvent();
+
+  @override
+  List<Object> get props => [];
+}
 
 class EmployeeListRequested extends EmployeeEvent {}
 
 class AddEmployeeRequested extends EmployeeEvent {
-  AddEmployeeRequested({required this.data});
+  const AddEmployeeRequested({required this.data});
 
   final EmployeeData data;
 }
 
 class RemoveEmployeeRequested extends EmployeeEvent {
-  RemoveEmployeeRequested({required this.index});
+  const RemoveEmployeeRequested({required this.index});
   final int index;
 }

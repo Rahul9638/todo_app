@@ -1,11 +1,16 @@
 part of 'employee_bloc.dart';
 
-class EmployeeState {}
+class EmployeeState extends Equatable {
+  const EmployeeState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class EmployeeInitial extends EmployeeState {}
 
 class EmployeeLoaded extends EmployeeState {
-  EmployeeLoaded({required this.employeeData});
+  const EmployeeLoaded({required this.employeeData});
 
   final List<EmployeeData> employeeData;
 }
