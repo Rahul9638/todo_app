@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:todo_app/modules/data/employee_detail.dart';
 import 'package:todo_app/modules/employee_manager/bloc/employee_bloc.dart';
 import 'package:todo_app/modules/employee_manager/view/widget/employee_role_bottomsheet.dart';
+import 'package:todo_app/modules/utils/form_validator.dart';
 import 'package:todo_app/modules/widgets/button/filled_button.dart';
 import 'package:todo_app/modules/widgets/custom_input_field.dart';
 import 'package:todo_app/modules/widgets/input_decoration.dart';
@@ -20,6 +22,16 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
   final TextEditingController employeeRole = TextEditingController();
   final TextEditingController startDate = TextEditingController();
   final TextEditingController lastDate = TextEditingController();
+  final BehaviorSubject<bool> validate = BehaviorSubject<bool>.seeded(false);
+
+  void validateButton(String? error) {
+    if (error == null) {
+      validate.add(true);
+    } else {
+      validate.add(false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -50,8 +62,7 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
   }
 
   void addEmployeeListener(BuildContext context, EmployeeState state) {
-    if (state is AddEmployeeLoading) {
-    }
+    if (state is AddEmployeeLoading) {}
     if (state is AddEmployeeSuccess) {
       Navigator.of(context).pop();
     }
@@ -85,20 +96,31 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           ),
           const SizedBox(width: 20),
           Expanded(
-            child: CustomFilledButton(
-              backgroundColor: theme.colorScheme.secondary,
-              borderRadius: 6,
-              onPressed: () {
-                BlocProvider.of<EmployeeBloc>(context).add(
-                  AddEmployeeRequested(data: getData()),
-                );
-              },
-              child: const Text('Save'),
-            ),
+            child: StreamBuilder<bool>(
+                stream: validate.stream,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  return CustomFilledButton(
+                    backgroundColor: theme.colorScheme.secondary,
+                    borderRadius: 6,
+                    onPressed: validateFields(snapshot) ? addEmployee : null,
+                    child: const Text('Save'),
+                  );
+                }),
           ),
         ],
       ),
     );
+  }
+
+  void addEmployee() => BlocProvider.of<EmployeeBloc>(context).add(
+        AddEmployeeRequested(data: getData()),
+      );
+  bool validateFields(AsyncSnapshot<bool> snapshot) {
+    return snapshot.hasData &&
+        snapshot.data! &&
+        employeeName.text.isNotEmpty &&
+        employeeRole.text.isNotEmpty &&
+        startDate.text.isNotEmpty;
   }
 
   EmployeeData getData() => EmployeeData(
@@ -173,6 +195,11 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           readOnly: true,
           controller: startDate,
           textCapitalization: TextCapitalization.words,
+          validation: (String? val) {
+            final String? error = ValidateForm.validateDate(val);
+            validateButton(error);
+            return error;
+          },
           keyboardType: TextInputType.name,
           decoration: CustomInputDecoration.outlineInputDecoration(
               prefixIcon: const Icon(
@@ -191,6 +218,11 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
         },
         readOnly: true,
         controller: employeeRole,
+        validation: (String? val) {
+          final String? error = ValidateForm.validateRole(val);
+          validateButton(error);
+          return error;
+        },
         textCapitalization: TextCapitalization.words,
         keyboardType: TextInputType.name,
         decoration: CustomInputDecoration.outlineInputDecoration(
@@ -205,6 +237,11 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
         controller: employeeName,
         textCapitalization: TextCapitalization.words,
         keyboardType: TextInputType.name,
+        validation: (String? val) {
+          final String? error = ValidateForm.validateName(val);
+          validateButton(error);
+          return error;
+        },
         decoration: CustomInputDecoration.outlineInputDecoration(
             prefixIcon: const Icon(
               Icons.person_outline,
