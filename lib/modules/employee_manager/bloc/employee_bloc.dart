@@ -18,9 +18,26 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       if (event is RemoveEmployeeRequested) {
         await removeEmployee(event, emit);
       }
+      if (event is UpdateEmployeeRequested) {
+        await updateEmployee(event, emit);
+      }
     });
   }
   final EmployeeRepository empRepo;
+
+  Future<void> updateEmployee(
+      UpdateEmployeeRequested event, Emitter<EmployeeState> emit) async {
+    try {
+      await empRepo
+          .updateEmployee(event.index, event.empData)
+          .then((void value) {
+        add(EmployeeListRequested());
+        emit(EmployeeUpdateSuccess());
+      });
+    } catch (e) {
+      emit(EmployeeUpdateError());
+    }
+  }
 
   Future<void> removeEmployee(
       RemoveEmployeeRequested event, Emitter<EmployeeState> emit) async {
@@ -46,7 +63,6 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     } catch (e) {
       emit(AddEmployeeError());
     }
-    ;
   }
 
   Future<void> getEmployee(Emitter<EmployeeState> emit) async {
@@ -58,4 +74,25 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       emit(EmployeeError());
     }
   }
+
+  late EmployeeData empData;
+  late int empDataIndex;
+  bool isEditFlow = false;
+  set isEdit(bool val) {
+    isEditFlow = val;
+  }
+
+  bool get isEdit => isEditFlow;
+
+  set getIndex(int index) {
+    empDataIndex = index;
+  }
+
+  int get getIndex => empDataIndex;
+
+  set getEmpData(EmployeeData data) {
+    empData = data;
+  }
+
+  EmployeeData get getEmpData => empData;
 }

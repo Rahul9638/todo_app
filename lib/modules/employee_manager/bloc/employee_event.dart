@@ -19,3 +19,9 @@ class RemoveEmployeeRequested extends EmployeeEvent {
   const RemoveEmployeeRequested({required this.index});
   final int index;
 }
+
+class UpdateEmployeeRequested extends EmployeeEvent {
+  const UpdateEmployeeRequested({required this.empData, required this.index});
+  final EmployeeData empData;
+  final int index;
+}

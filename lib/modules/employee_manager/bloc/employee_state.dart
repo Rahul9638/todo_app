@@ -30,3 +30,9 @@ class DeleteEmpLoading extends EmployeeState {}
 class DeleteEmpLoaded extends EmployeeState {}
 
 class DeleteEmpError extends EmployeeState {}
+
+class EmployeeUpdateLoading extends EmployeeState {}
+
+class EmployeeUpdateSuccess extends EmployeeState {}
+
+class EmployeeUpdateError extends EmployeeState {}

@@ -18,11 +18,27 @@ class AddEmployeePage extends StatefulWidget {
 }
 
 class _AddEmployeePageState extends State<AddEmployeePage> {
+  late EmployeeBloc empBloc;
   final TextEditingController employeeName = TextEditingController();
   final TextEditingController employeeRole = TextEditingController();
   final TextEditingController startDate = TextEditingController();
   final TextEditingController lastDate = TextEditingController();
   final BehaviorSubject<bool> validate = BehaviorSubject<bool>.seeded(false);
+  @override
+  void initState() {
+    empBloc = BlocProvider.of(context);
+    editFlow();
+    super.initState();
+  }
+
+  void editFlow() {
+    if (empBloc.isEdit) {
+      employeeName.text = empBloc.empData.employeeName;
+      employeeRole.text = empBloc.empData.employeeRole;
+      startDate.text = empBloc.empData.startDate;
+      lastDate.text = empBloc.empData.endDate ?? '';
+    }
+  }
 
   void validateButton(String? error) {
     if (error == null) {
@@ -62,8 +78,13 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
   }
 
   void addEmployeeListener(BuildContext context, EmployeeState state) {
-    if (state is AddEmployeeLoading) {}
     if (state is AddEmployeeSuccess) {
+      Navigator.of(context).pop();
+    }
+    if (state is EmployeeUpdateSuccess) {
+      Navigator.of(context).pop();
+    }
+    if (state is DeleteEmpLoaded) {
       Navigator.of(context).pop();
     }
   }
@@ -97,24 +118,38 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           const SizedBox(width: 20),
           Expanded(
             child: StreamBuilder<bool>(
-                stream: validate.stream,
-                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                  return CustomFilledButton(
-                    backgroundColor: theme.colorScheme.secondary,
-                    borderRadius: 6,
-                    onPressed: validateFields(snapshot) ? addEmployee : null,
-                    child: const Text('Save'),
-                  );
-                }),
+              stream: validate.stream,
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                return CustomFilledButton(
+                  backgroundColor: theme.colorScheme.secondary,
+                  borderRadius: 6,
+                  onPressed: validateFields(snapshot) ? addEmployee : null,
+                  child: const Text('Save'),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  void addEmployee() => BlocProvider.of<EmployeeBloc>(context).add(
-        AddEmployeeRequested(data: getData()),
+  void addEmployee() {
+    if (empBloc.isEdit) {
+      BlocProvider.of<EmployeeBloc>(context).add(
+        UpdateEmployeeRequested(empData: getData(), index: empBloc.getIndex),
       );
+    } else {
+      BlocProvider.of<EmployeeBloc>(context)
+          .add(AddEmployeeRequested(data: getData()));
+    }
+  }
+
+  void deleteEmployee() {
+    BlocProvider.of<EmployeeBloc>(context)
+        .add(RemoveEmployeeRequested(index: empBloc.getIndex));
+  }
+
   bool validateFields(AsyncSnapshot<bool> snapshot) {
     return snapshot.hasData &&
         snapshot.data! &&
@@ -129,6 +164,7 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
         startDate: startDate.text,
         endDate: lastDate.text.isEmpty ? null : lastDate.text,
       );
+
   AppBar getAppBar(ThemeData theme) => AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
@@ -137,8 +173,20 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           },
         ),
         centerTitle: false,
+        actions: <Widget>[
+          Visibility(
+            visible: empBloc.isEdit,
+            child: IconButton(
+              onPressed: () {
+                deleteEmployee();
+              },
+              icon: const Icon(Icons.delete_outline_rounded),
+              color: theme.colorScheme.onPrimary,
+            ),
+          )
+        ],
         title: Text(
-          'Add Employee',
+          empBloc.isEdit ? 'Edit Employee Details' : 'Add Employee',
           style: theme.textTheme.titleMedium
               ?.copyWith(color: theme.colorScheme.onPrimary),
         ),

@@ -55,6 +55,7 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          BlocProvider.of<EmployeeBloc>(context).isEdit = false;
           Navigator.of(context).pushNamed(AppRoute.addEmployee);
         },
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
