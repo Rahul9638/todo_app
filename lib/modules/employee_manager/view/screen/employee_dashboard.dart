@@ -65,7 +65,7 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
 
   Widget categoryLabel(ThemeData theme, String label) {
     return Container(
-      height: 95,
+      height: MediaQuery.of(context).size.height * 0.12,
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(16),
       color: theme.colorScheme.outlineVariant,

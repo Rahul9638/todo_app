@@ -19,6 +19,7 @@ class AddEmployeePage extends StatefulWidget {
 
 class _AddEmployeePageState extends State<AddEmployeePage> {
   late EmployeeBloc empBloc;
+  final Color iconColor = const Color.fromRGBO(29, 161, 242, 1);
   final TextEditingController employeeName = TextEditingController();
   final TextEditingController employeeRole = TextEditingController();
   final TextEditingController startDate = TextEditingController();
@@ -213,8 +214,9 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           textCapitalization: TextCapitalization.words,
           keyboardType: TextInputType.name,
           decoration: CustomInputDecoration.outlineInputDecoration(
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.calendar_today,
+                color: iconColor,
               ),
               labelText: 'No Date',
               hintText: 'Select Role'),
@@ -250,8 +252,9 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           },
           keyboardType: TextInputType.name,
           decoration: CustomInputDecoration.outlineInputDecoration(
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.calendar_today,
+                color: iconColor,
               ),
               labelText: 'Today',
               hintText: 'Select Role'),
@@ -274,9 +277,13 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
         textCapitalization: TextCapitalization.words,
         keyboardType: TextInputType.name,
         decoration: CustomInputDecoration.outlineInputDecoration(
-            suffixIcon: const Icon(Icons.arrow_drop_down),
-            prefixIcon: const Icon(
+            suffixIcon: Icon(
+              Icons.arrow_drop_down,
+              color: iconColor,
+            ),
+            prefixIcon: Icon(
               Icons.work_outline,
+              color: iconColor,
             ),
             labelText: 'Select Role',
             hintText: 'Select Role'),
@@ -291,8 +298,9 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
           return error;
         },
         decoration: CustomInputDecoration.outlineInputDecoration(
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.person_outline,
+              color: iconColor,
             ),
             labelText: 'Employee name',
             hintText: 'Employee name'),

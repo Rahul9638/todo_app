@@ -41,13 +41,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
           BlocProvider.of<EmployeeBloc>(context)
               .add(RemoveEmployeeRequested(index: widget.index));
           CustomSnackbar.snackBarWithAction(context,
-              message: 'Employee data has been deleted', onPressed: () {
-            updateEmployee(
-              context,
-              empData: widget.employeeData,
-              index: widget.index,
-            );
-          });
+              message: 'Employee data has been deleted',);
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
