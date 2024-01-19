@@ -17,8 +17,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<EmployeeBloc>(
-      create: (context) => EmployeeBloc(EmployeeRepository()),
+      create: (BuildContext context) => EmployeeBloc(EmployeeRepository()),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         initialRoute: AppRoute.home,
         theme: CustomTheme.lightTheme(),

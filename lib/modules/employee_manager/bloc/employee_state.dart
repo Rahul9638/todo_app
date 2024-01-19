@@ -19,3 +19,9 @@ class AddEmployeeLoading extends EmployeeState {}
 class AddEmployeeSuccess extends EmployeeState {}
 
 class AddEmployeeError extends EmployeeState {}
+
+class DeleteEmpLoading extends EmployeeState {}
+
+class DeleteEmpLoaded extends EmployeeState {}
+
+class DeleteEmpError extends EmployeeState {}

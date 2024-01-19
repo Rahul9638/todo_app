@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:todo_app/modules/data/employee_detail.dart';
+import 'package:todo_app/modules/employee_manager/bloc/employee_bloc.dart';
+import 'package:todo_app/modules/utils/svg_assets.dart';
 
 class EmployeeDetail extends StatelessWidget {
   const EmployeeDetail(
@@ -12,17 +16,20 @@ class EmployeeDetail extends StatelessWidget {
       key: Key(employeeData.employeeName),
       direction: DismissDirection.endToStart,
       background: Container(
-        padding: EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.only(right: 20),
         alignment: Alignment.centerRight,
         color: Colors.red,
-        child: Icon(Icons.delete_outline_sharp),
+        child: SvgPicture.asset(SvgAssetPath.delete),
       ),
-      onDismissed: (DismissDirection direction) {},
+      onDismissed: (DismissDirection direction) {
+        BlocProvider.of<EmployeeBloc>(context)
+            .add(RemoveEmployeeRequested(index: index));
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -43,7 +50,7 @@ class EmployeeDetail extends StatelessWidget {
                       fontWeight: FontWeight.w400),
                 ),
                 Text(
-                  'From ${employeeData.startDate}',
+                  date(employeeData),
                   style: const TextStyle(
                       fontFamily: 'Roboto',
                       fontSize: 12,
@@ -57,5 +64,11 @@ class EmployeeDetail extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String date(EmployeeData data) {
+    return data.endDate == null
+        ? 'From ${data.startDate}'
+        : '${data.startDate} - ${data.endDate}';
   }
 }

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/modules/config/route.dart';
 import 'package:todo_app/modules/employee_manager/bloc/employee_bloc.dart';
-import 'package:todo_app/modules/employee_manager/view/widget/employe_detail_tile.dart';
+import 'package:todo_app/modules/employee_manager/view/widget/employee_empty.dart';
+import 'package:todo_app/modules/employee_manager/view/widget/employee_loaded.dart';
 
 class EmployeeDashBoardPage extends StatefulWidget {
   const EmployeeDashBoardPage({super.key});
@@ -33,17 +34,16 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
       body: BlocBuilder<EmployeeBloc, EmployeeState>(
         builder: (BuildContext context, EmployeeState state) {
           if (state is EmployeeLoaded && state.employeeData.isEmpty) {
-            return const Center(
-              child: Text('NO EmployeeRecord'),
-            );
+            return const NoEmployeeFoundWidget();
           }
           if (state is EmployeeLoaded && state.employeeData.isNotEmpty) {
             return Column(
-                children: List<Widget>.generate(state.employeeData.length,
-                    (int index) {
-              return EmployeeDetail(
-                  employeeData: state.employeeData[index], index: index);
-            }));
+              children: [
+                Expanded(
+                    child: EmployeeList(state: state)),
+                categoryLabel(theme, 'Swip left to delete'),
+              ],
+            );
           }
           if (state is EmployeeLoading) {
             return const Center(
@@ -53,11 +53,28 @@ class _EmployeeDashBoardPageState extends State<EmployeeDashBoardPage> {
           return Container();
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).pushNamed(AppRoute.addEmployee);
         },
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
+      ),
+    );
+  }
+
+  Widget categoryLabel(ThemeData theme, String label) {
+    return Container(
+      height: 95,
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(16),
+      color: theme.colorScheme.outlineVariant,
+      child: Text(
+        label,
+        style: theme.textTheme.titleMedium?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.outline),
       ),
     );
   }

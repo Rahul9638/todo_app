@@ -12,19 +12,41 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
         await getEmployee(emit);
       }
       if (event is AddEmployeeRequested) {
-        emit(AddEmployeeLoading());
-        try {
-          await empRepo.addEmployee(event.data).then((void value) {
-            emit(AddEmployeeSuccess());
-            add(EmployeeListRequested());
-          });
-        } catch (e) {
-          emit(AddEmployeeError());
-        }
+        await addEmployee(event, emit);
+      }
+      if (event is RemoveEmployeeRequested) {
+        await removeEmployee(event, emit);
       }
     });
   }
   final EmployeeRepository empRepo;
+
+  Future<void> removeEmployee(
+      RemoveEmployeeRequested event, Emitter<EmployeeState> emit) async {
+    emit(DeleteEmpLoading());
+    try {
+      await empRepo.deleteEmployee(event.index).then((void value) {
+        emit(DeleteEmpLoaded());
+        add(EmployeeListRequested());
+      });
+    } catch (e) {
+      emit(DeleteEmpError());
+    }
+  }
+
+  Future<void> addEmployee(
+      AddEmployeeRequested event, Emitter<EmployeeState> emit) async {
+    emit(AddEmployeeLoading());
+    try {
+      await empRepo.addEmployee(event.data).then((void value) {
+        emit(AddEmployeeSuccess());
+        add(EmployeeListRequested());
+      });
+    } catch (e) {
+      emit(AddEmployeeError());
+    }
+    ;
+  }
 
   Future<void> getEmployee(Emitter<EmployeeState> emit) async {
     emit(EmployeeLoading());

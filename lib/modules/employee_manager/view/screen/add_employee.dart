@@ -51,7 +51,6 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
 
   void addEmployeeListener(BuildContext context, EmployeeState state) {
     if (state is AddEmployeeLoading) {
-      // circularProgress Indicator.
     }
     if (state is AddEmployeeSuccess) {
       Navigator.of(context).pop();
@@ -158,7 +157,7 @@ class _AddEmployeePageState extends State<AddEmployeePage> {
             lastDate: DateTime(2030))
         .then((DateTime? value) {
       if (value != null) {
-        final DateFormat formatter = DateFormat('dd MMM yyyy');
+        final DateFormat formatter = DateFormat('dd MMM, yyyy');
         final String formatted = formatter.format(value);
         date.text = formatted;
         setState(() {});

@@ -9,3 +9,8 @@ class AddEmployeeRequested extends EmployeeEvent {
 
   final EmployeeData data;
 }
+
+class RemoveEmployeeRequested extends EmployeeEvent {
+  RemoveEmployeeRequested({required this.index});
+  final int index;
+}
